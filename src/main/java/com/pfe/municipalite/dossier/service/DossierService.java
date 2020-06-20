@@ -7,5 +7,7 @@ public interface DossierService {
     public ResponseEntity<?> ajouterDossier(Dossier dossier);
     public ResponseEntity<?> ListeDossier();
     public ResponseEntity<?> getDossierById(Long id);
+    public void supprimerDossier(Long id);
+    public ResponseEntity<?> modifierDossier(Long id , Dossier dossier);
 
 }

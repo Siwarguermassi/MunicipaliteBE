@@ -28,5 +28,16 @@ public class DossierController {
        return  dossierService.getDossierById(id);
    }
 
+    @RequestMapping(value="/deleteById/{id}",method = RequestMethod.GET)
+    public  void deleteById(@PathVariable Long id){
+          dossierService.supprimerDossier(id);
+    }
+    @RequestMapping(value = "/updateById/{id}",method = RequestMethod.POST)
+    public ResponseEntity<?> updateById(@PathVariable Long id, @RequestBody Dossier dossier){
+        return dossierService.modifierDossier(id,dossier);
+    }
+
+
+
 
 }
