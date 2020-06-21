@@ -13,7 +13,8 @@ public class DossierServiceImpl implements DossierService{
     public DossierRepository repository;
 
     @Override
-    public ResponseEntity<?> ajouterDossier(Dossier dossier) {
+    public ResponseEntity<?> ajouterDossier(Dossier dossier)
+    {
         return ResponseEntity.ok(repository.save(dossier));
     }
 
@@ -29,4 +30,27 @@ public class DossierServiceImpl implements DossierService{
         repository.findById(id).orElseThrow(()->new ProductNotFoundException("Dossier n'esxiste pas"));
        return ResponseEntity.ok(repository.findById(id));
     }
+
+    @Override
+    public void supprimerDossier(Long id) {
+        repository.findById(id).orElseThrow(()->new ProductNotFoundException("Dossier n'esxiste pas"));
+          repository.deleteById(id);
+    }
+
+    @Override
+    public ResponseEntity<?> modifierDossier(Long id, Dossier dossier) {
+        repository.findById(id).orElseThrow(()->new ProductNotFoundException("Dossier n'esxiste pas"));
+        Dossier doss= repository.findById(id).get();
+        doss.setId_architecte(dossier.getId_architecte());
+        doss.setId_commission(dossier.getId_commission());
+        doss.setId_decision(dossier.getId_decision());
+        doss.setId_nature(dossier.getId_nature());
+        doss.setId_proprietaire(dossier.getId_proprietaire());
+        doss.setId_terrain(dossier.getId_terrain());
+        doss.setId_type_construction(dossier.getId_type_construction());
+
+        return ResponseEntity.ok(repository.save(doss));
+    }
+
+
 }

@@ -7,4 +7,5 @@ public interface NatureService {
     public ResponseEntity<?> ajouterNature(Nature nature);
     public ResponseEntity<?> ListeNature();
     public ResponseEntity<?> getNatureById(Long id);
+    public void supprimerById(Long id);
 }
