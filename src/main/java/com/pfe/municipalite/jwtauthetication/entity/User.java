@@ -48,6 +48,16 @@ public class User {
 	private boolean validate;
 	
 	private String userRole;
+	
+	private long idDossier;
+
+	public long getIdDossier() {
+		return idDossier;
+	}
+
+	public void setIdDossier(long idDossier) {
+		this.idDossier = idDossier;
+	}
 
 	public String getUserRole() {
 		return userRole;
