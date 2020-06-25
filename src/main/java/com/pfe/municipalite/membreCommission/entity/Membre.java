@@ -27,6 +27,26 @@ public class Membre {
 	@Size(max = 50)
 	@Email
 	private String email;
+	
+	private String type;
+	
+	private Long commission_id;
+
+	public Long getCommission_id() {
+		return commission_id;
+	}
+
+	public void setCommission_id(Long commission_id) {
+		this.commission_id = commission_id;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	public Long getId() {
 		return id;

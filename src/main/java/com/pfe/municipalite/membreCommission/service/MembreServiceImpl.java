@@ -3,13 +3,15 @@ package com.pfe.municipalite.membreCommission.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import com.pfe.municipalite.globalException.ProductNotFoundException;
 import com.pfe.municipalite.membreCommission.entity.Membre;
 import com.pfe.municipalite.membreCommission.repository.MembreRepository;
 
+@Service
 public class MembreServiceImpl implements MembreService {
-	
+
 	@Autowired
 	MembreRepository repository;
 
@@ -50,16 +52,27 @@ public class MembreServiceImpl implements MembreService {
 	public void deleteMemberById(Long id) {
 		// TODO Auto-generated method stub
 		try {
-			repository.findById(id).orElseThrow(() -> new ProductNotFoundException("Decision n'esxiste pas"));
+			repository.findById(id).orElseThrow(() -> new ProductNotFoundException("Membre n'esxiste pas"));
 			repository.deleteById(id);
 		} catch (Exception e) {
-			 new ResponseEntity<>("Error!", HttpStatus.BAD_REQUEST);
+			new ResponseEntity<>("Error!", HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	@Override
-	public ResponseEntity<?> updateMemberById(Long id) {
+	public ResponseEntity<?> updateMemberById(Long id, Membre membre) {
 		// TODO Auto-generated method stub
+		try {
+			Membre mb = repository.findById(id).orElseThrow(() -> new ProductNotFoundException("Membre n'esxiste pas"));
+			mb.setEmail(membre.getEmail());
+			mb.setCommission_id(membre.getCommission_id());
+			mb.setName(membre.getName());
+			mb.setType(membre.getType());
+			return ResponseEntity.ok(repository.save(mb));
+		} catch (Exception e) {
+			// TODO: handle exception
+			new ResponseEntity<>("Error!", HttpStatus.BAD_REQUEST);
+		}
 		return null;
 	}
 

@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,6 +34,7 @@ import com.pfe.municipalite.jwtauthetication.repository.UserRepository;
 
 @RestController
 @RequestMapping("auth")
+@CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
 	@Autowired
@@ -56,7 +58,7 @@ public class AuthController {
 	@RequestMapping(value = "/signin", method = RequestMethod.POST)
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
 
-		checkRules();
+		//checkRules();
 
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -71,7 +73,7 @@ public class AuthController {
 
 	@RequestMapping(value = "/signup", method = RequestMethod.POST)
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
-		checkRules();
+		//checkRules();
 		String strRoles = user.getUserRole();
 		Set<Role> roles = new HashSet<>();
 
@@ -112,7 +114,7 @@ public class AuthController {
 		return null;
 	}
 
-	private void checkRules() {
+	/*private void checkRules() {
 		Optional<Role> userRole = repository.findByName(RoleName.ROLE_USER);
 		Optional<Role> empRole = repository.findByName(RoleName.ROLE_PM);
 		Optional<Role> adminRole = repository.findByName(RoleName.ROLE_ADMIN);
@@ -131,6 +133,6 @@ public class AuthController {
 			rl3.setName(RoleName.ROLE_ADMIN);
 			repository.save(rl3);
 		}
-	}
+	}*/
 
 }

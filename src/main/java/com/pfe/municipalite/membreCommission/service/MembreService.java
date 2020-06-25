@@ -14,7 +14,7 @@ public interface MembreService {
 	
 	public void deleteMemberById(Long id);
 	
-	public ResponseEntity<?> updateMemberById(Long id);
+	public ResponseEntity<?> updateMemberById(Long id, Membre membre);
 
 	public ResponseEntity<?> inviteMember(Long id, Long commissionId);
 
