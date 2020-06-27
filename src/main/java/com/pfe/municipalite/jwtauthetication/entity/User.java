@@ -47,6 +47,26 @@ public class User {
 
 	private boolean validate;
 	
+	private String address;
+
+	private String phone;
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+	
 	private String userRole;
 	
 	private long idDossier;

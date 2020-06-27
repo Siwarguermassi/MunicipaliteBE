@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pfe.municipalite.commission.entity.Commission;
+import com.pfe.municipalite.commission.repository.CommissionRepository;
 import com.pfe.municipalite.membreCommission.entity.Membre;
 import com.pfe.municipalite.membreCommission.repository.MembreRepository;
 import com.pfe.municipalite.membreCommission.service.MembreService;
@@ -39,6 +41,9 @@ public class MembreController {
 
 	@Autowired
 	MembreRepository repository;
+	
+	@Autowired
+	CommissionRepository commissionRepository;
 
 	@RequestMapping(value = "/getAll", method = RequestMethod.GET)
 	public ResponseEntity<?> getAllMembers() {
@@ -54,23 +59,37 @@ public class MembreController {
 	public void deleteMemberById(@PathVariable("id") Long id) {
 		service.deleteMemberById(id);
 	}
+	
+	@RequestMapping(value = "/updateMemberById/{id}", method = RequestMethod.POST)
+	public ResponseEntity<?> updateMemberById(@PathVariable("id") Long id, @RequestBody Membre membre) {
+		return service.updateMemberById(id, membre);
+	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	public ResponseEntity<?> addMembre(@RequestBody Membre membre) {
 		return service.addMember(membre);
 	}
 
-	@RequestMapping(value = "/invite/{memberId}/{comId}", method = RequestMethod.GET)
-	public String sendEmail(@PathVariable("memberId") Long memberId, @PathVariable("comId") Long comId)
+	@RequestMapping(value = "/invite/{memberId}/{comId}/{subject}", method = RequestMethod.GET)
+	public ResponseEntity<?> sendEmail(@PathVariable("memberId") Long memberId, @PathVariable("comId") Long comId, @PathVariable("subject") String subject)
 			throws AddressException, MessagingException, IOException {
 		Membre membre = repository.findById(memberId).get();
-		membre.setCommission_id(comId);
+		if(subject.equals("invite")) {
+			membre.setCommission_id(comId);
+		}
+		else {
+			membre.setCommission_id(null);
+		}
 		service.updateMemberById(memberId, membre);
-		sendmail(membre.getEmail());
-		return "Email sent successfully";
+		Commission com = commissionRepository.findById(comId).get();
+		Long date = com.getDate();
+		String dt = new Date(com.getDate()).toString();
+		System.out.println(dt);
+		sendmail(membre.getEmail(), subject, dt);
+		return ResponseEntity.ok(membre);
 	}
 
-	private void sendmail(String email) throws AddressException, MessagingException, IOException {
+	private void sendmail(String email, String subject, String date) throws AddressException, MessagingException, IOException {
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
@@ -87,11 +106,16 @@ public class MembreController {
 		msg.setFrom(new InternetAddress("municipality2020municipality@gmail.com", false));
 
 		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
-		msg.setSubject("Invitation");
+		if(subject.equals("invite")) {
+			msg.setSubject("Invitation");
+		}
+		else {
+			msg.setSubject("Annulation d'invitation");
+		}
 		msg.setContent("Hello my friend", "text/html");
 		msg.setSentDate(new Date());
 		MimeBodyPart messageBodyPart = new MimeBodyPart();
-		messageBodyPart.setContent("commission le 24/06/2020", "text/html");
+		messageBodyPart.setContent("commission "+ date, "text/html");
 
 		Multipart multipart = new MimeMultipart();
 		multipart.addBodyPart(messageBodyPart);

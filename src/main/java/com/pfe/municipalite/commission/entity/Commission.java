@@ -21,13 +21,13 @@ public class Commission {
 		this.id = id;
 	}
 
-	public String getDate() {
+	public Long getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(Long date) {
 		this.date = date;
 	}
 
-	private String date;
+	private Long date;
 }

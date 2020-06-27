@@ -8,7 +8,6 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -58,7 +58,7 @@ public class AuthController {
 	@RequestMapping(value = "/signin", method = RequestMethod.POST)
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
 
-		//checkRules();
+		// checkRules();
 
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -73,7 +73,7 @@ public class AuthController {
 
 	@RequestMapping(value = "/signup", method = RequestMethod.POST)
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
-		//checkRules();
+		// checkRules();
 		String strRoles = user.getUserRole();
 		Set<Role> roles = new HashSet<>();
 
@@ -100,7 +100,24 @@ public class AuthController {
 		user.setRoles(roles);
 		user.setPassword(encoder.encode(user.getPassword()));
 		userRepository.save(user);
-		return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
+		// return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
+		return ResponseEntity.ok(user);
+	}
+
+	@RequestMapping(value = "/deleteUser/{id}", method = RequestMethod.GET)
+	public void deleteUser(@PathVariable long id) {
+		userRepository.deleteById(id);
+	}
+
+	@RequestMapping(value = "/updateUser/{id}", method = RequestMethod.POST)
+	public ResponseEntity<?> updateUser(@PathVariable long id, @RequestBody User user) {
+		User usr1 = userRepository.findById(id).get();
+		usr1.setEmail(user.getEmail());
+		usr1.setPhone(user.getPhone());
+		usr1.setAddress(user.getAddress());
+		usr1.setName(user.getName());
+
+		return ResponseEntity.ok(userRepository.save(usr1));
 	}
 
 	@RequestMapping(value = "/resetPWD", method = RequestMethod.GET)
@@ -114,25 +131,20 @@ public class AuthController {
 		return null;
 	}
 
-	/*private void checkRules() {
-		Optional<Role> userRole = repository.findByName(RoleName.ROLE_USER);
-		Optional<Role> empRole = repository.findByName(RoleName.ROLE_PM);
-		Optional<Role> adminRole = repository.findByName(RoleName.ROLE_ADMIN);
-		if (userRole.isEmpty()) {
-			Role rl = new Role();
-			rl.setName(RoleName.ROLE_USER);
-			repository.save(rl);
-		}
-		if (empRole.isEmpty()) {
-			Role rl2 = new Role();
-			rl2.setName(RoleName.ROLE_PM);
-			repository.save(rl2);
-		}
-		if (adminRole.isEmpty()) {
-			Role rl3 = new Role();
-			rl3.setName(RoleName.ROLE_ADMIN);
-			repository.save(rl3);
-		}
-	}*/
+	@RequestMapping(value = "/getUsersByRole/{role}", method = RequestMethod.GET)
+	public ResponseEntity<?> getUsersByRole(@PathVariable String role) {
+		return ResponseEntity.ok(userRepository.findByRole(role));
+	}
+
+	/*
+	 * private void checkRules() { Optional<Role> userRole =
+	 * repository.findByName(RoleName.ROLE_USER); Optional<Role> empRole =
+	 * repository.findByName(RoleName.ROLE_PM); Optional<Role> adminRole =
+	 * repository.findByName(RoleName.ROLE_ADMIN); if (userRole.isEmpty()) { Role rl
+	 * = new Role(); rl.setName(RoleName.ROLE_USER); repository.save(rl); } if
+	 * (empRole.isEmpty()) { Role rl2 = new Role(); rl2.setName(RoleName.ROLE_PM);
+	 * repository.save(rl2); } if (adminRole.isEmpty()) { Role rl3 = new Role();
+	 * rl3.setName(RoleName.ROLE_ADMIN); repository.save(rl3); } }
+	 */
 
 }

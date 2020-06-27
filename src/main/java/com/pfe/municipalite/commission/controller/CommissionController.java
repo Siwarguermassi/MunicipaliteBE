@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pfe.municipalite.commission.entity.Commission;
 import com.pfe.municipalite.commission.service.CommissionService;
+import com.pfe.municipalite.membreCommission.repository.MembreRepository;
 
 @RestController
 @RequestMapping("commission")
@@ -20,6 +21,9 @@ public class CommissionController {
 	@Autowired
 	CommissionService service;
 
+	@Autowired
+	MembreRepository repository;
+
 	@RequestMapping(value = "/getAll", method = RequestMethod.GET)
 	public ResponseEntity<?> getAllCommissions() {
 		return service.getAllCommissions();
@@ -28,6 +32,11 @@ public class CommissionController {
 	@RequestMapping(value = "/getCommissionById/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> getCommissionById(@PathVariable Long id) {
 		return service.getCommissionById(id);
+	}
+
+	@RequestMapping(value = "/getCommissionMembersById/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getCommissionMembersById(@PathVariable Long id) {
+		return ResponseEntity.ok(repository.getCommissionMembers(id));
 	}
 
 	@RequestMapping(value = "/getCommissionDossiers/{id}", method = RequestMethod.GET)

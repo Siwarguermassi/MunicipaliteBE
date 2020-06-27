@@ -68,6 +68,8 @@ public class MembreServiceImpl implements MembreService {
 			mb.setCommission_id(membre.getCommission_id());
 			mb.setName(membre.getName());
 			mb.setType(membre.getType());
+			mb.setPhone(membre.getPhone());
+			mb.setAddress(mb.getAddress());
 			return ResponseEntity.ok(repository.save(mb));
 		} catch (Exception e) {
 			// TODO: handle exception
