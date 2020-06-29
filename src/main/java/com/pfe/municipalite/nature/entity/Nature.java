@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(name="NatureConstruction")
+@Table(name="nature_construction")
 public class Nature {
 
     @Id

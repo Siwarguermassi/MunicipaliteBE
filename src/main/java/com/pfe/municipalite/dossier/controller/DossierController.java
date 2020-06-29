@@ -1,5 +1,10 @@
 package com.pfe.municipalite.dossier.controller;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pfe.municipalite.dossier.entity.Dossier;
+import com.pfe.municipalite.dossier.entity.DossierDetails;
 import com.pfe.municipalite.dossier.repository.DossierRepository;
 import com.pfe.municipalite.dossier.service.DossierService;
 
@@ -54,9 +60,14 @@ public class DossierController {
 		return dossierService.affectDossierToCommission(id, idCom);
 	}
 
-	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	public ResponseEntity<?> test() {
+	@RequestMapping(value = "/getAllDossiersWithDetails", method = RequestMethod.GET)
+	public ResponseEntity<?> getAllDossiersWithDetails() {
 		return ResponseEntity.ok(repo.findJoin());
+	}
+
+	@RequestMapping(value = "/getOneDossierDetails/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getOneDossierDetails(@PathVariable("id") Long id) {
+		return ResponseEntity.ok(repo.findOneDossier(id));
 	}
 
 }
