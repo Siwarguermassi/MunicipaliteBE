@@ -68,7 +68,10 @@ public class AuthController {
 		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
 		Optional<User> usr = userRepository.findByUsername(userDetails.getUsername());
-		return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), userDetails.getAuthorities()));
+		User usr11 = usr.get();
+
+		return ResponseEntity
+				.ok(new JwtResponse(usr11.getId(), jwt, userDetails.getUsername(), userDetails.getAuthorities()));
 	}
 
 	@RequestMapping(value = "/signup", method = RequestMethod.POST)
@@ -134,6 +137,11 @@ public class AuthController {
 	@RequestMapping(value = "/getUsersByRole/{role}", method = RequestMethod.GET)
 	public ResponseEntity<?> getUsersByRole(@PathVariable String role) {
 		return ResponseEntity.ok(userRepository.findByRole(role));
+	}
+
+	@RequestMapping(value = "/getUsersById/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getUsersById(@PathVariable Long id) {
+		return ResponseEntity.ok(userRepository.findById(id));
 	}
 
 	/*

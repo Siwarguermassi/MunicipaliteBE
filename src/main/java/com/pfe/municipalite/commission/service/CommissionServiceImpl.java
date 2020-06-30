@@ -89,7 +89,7 @@ public class CommissionServiceImpl implements CommissionService {
 		// TODO Auto-generated method stub
 		try {
 			repository.findById(id).orElseThrow(() -> new ProductNotFoundException("commission n'esxiste pas"));
-			return ResponseEntity.ok(dossierRepository.getCommissionDossiers(id));
+			return ResponseEntity.ok(dossierRepository.findDossierCom(id));
 
 		} catch (Exception e) {
 			// TODO: handle exception

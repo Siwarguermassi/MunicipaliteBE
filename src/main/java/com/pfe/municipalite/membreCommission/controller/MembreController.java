@@ -121,9 +121,8 @@ public class MembreController {
 		multipart.addBodyPart(messageBodyPart);
 		MimeBodyPart attachPart = new MimeBodyPart();
 
-		// attachPart.attachFile("/var/tmp/image19.png");
-		attachPart.attachFile("C:/Users/asus/Desktop/Dev/Municipality.pdf");
-		multipart.addBodyPart(attachPart);
+		//attachPart.attachFile("C:/Users/asus/Desktop/Dev/Municipality.pdf");
+		//multipart.addBodyPart(attachPart);
 		msg.setContent(multipart);
 		Transport.send(msg);
 	}
