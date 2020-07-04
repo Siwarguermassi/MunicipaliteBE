@@ -1,13 +1,28 @@
 package com.pfe.municipalite.jwtauthetication.controller;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,8 +38,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pfe.municipalite.dossier.repository.DossierRepository;
+import com.pfe.municipalite.globalException.ProductNotFoundException;
 import com.pfe.municipalite.jwtauthetication.entity.JwtResponse;
 import com.pfe.municipalite.jwtauthetication.entity.LoginForm;
+import com.pfe.municipalite.jwtauthetication.entity.ResetPwdForm;
 import com.pfe.municipalite.jwtauthetication.entity.Role;
 import com.pfe.municipalite.jwtauthetication.entity.RoleName;
 import com.pfe.municipalite.jwtauthetication.entity.User;
@@ -123,15 +140,65 @@ public class AuthController {
 		return ResponseEntity.ok(userRepository.save(usr1));
 	}
 
-	@RequestMapping(value = "/resetPWD", method = RequestMethod.GET)
-	public ResponseEntity<?> resetPassword() {
+	@RequestMapping(value = "/resetPWDSend/{email}", method = RequestMethod.GET)
+	public ResponseEntity<?> resetPasswordSend(@PathVariable String email)
+			throws AddressException, MessagingException, IOException {
+		userRepository.findByUsername(email).orElseThrow(() -> new ProductNotFoundException("User Not Found"));
+		User usr = userRepository.findByUsername(email).get();
 		String token = UUID.randomUUID().toString();
-		return ResponseEntity.ok(token);
+		System.out.println(usr.getEmail());
+		Properties props = new Properties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.port", "587");
+		props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
+		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication("municipality2020municipality@gmail.com", "municipality.2020");
+			}
+		});
+		Message msg = new MimeMessage(session);
+		msg.setFrom(new InternetAddress("municipality2020municipality@gmail.com", false));
+
+		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(usr.getEmail()));
+		msg.setSubject("Reset Password");
+		msg.setContent("Hello my friend", "text/html");
+		msg.setSentDate(new Date());
+		MimeBodyPart messageBodyPart = new MimeBodyPart();
+		messageBodyPart.setContent("http://localhost:4200/resetPwd/" + token + '/' + usr.getEmail(), "text/html");
+
+		Multipart multipart = new MimeMultipart();
+		multipart.addBodyPart(messageBodyPart);
+		MimeBodyPart attachPart = new MimeBodyPart();
+
+		// attachPart.attachFile("C:/Users/asus/Desktop/Dev/Municipality.pdf");
+		// multipart.addBodyPart(attachPart);
+		msg.setContent(multipart);
+		Transport.send(msg);
+
+		return ResponseEntity.ok(HttpStatus.ACCEPTED);
 	}
 
-	@RequestMapping(value = "/changePWD", method = RequestMethod.POST)
-	public ResponseEntity<?> changePassword() {
-		return null;
+	@RequestMapping(value = "/resetPassword/{email}", method = RequestMethod.POST)
+	public ResponseEntity<?> resetPassword(@RequestBody ResetPwdForm request, @PathVariable String email) {
+		userRepository.findByUsername(email).orElseThrow(() -> new ProductNotFoundException("User Not Founf"));
+		User usr = userRepository.findByUsername(email).get();
+		usr.setPassword(encoder.encode(request.getPassword()));
+		return ResponseEntity.ok(userRepository.save(usr));
+	}
+
+	@RequestMapping(value = "/changePWD/{id}", method = RequestMethod.POST)
+	public ResponseEntity<?> changePassword(@RequestBody ResetPwdForm request, @PathVariable Long id) {
+		userRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("User Not Founf"));
+		User usr = userRepository.findById(id).get();
+		System.out.println(request.getLastPassword());
+		if (encoder.matches(request.getLastPassword(), usr.getPassword())) {
+			usr.setPassword(encoder.encode(request.getPassword()));
+			return ResponseEntity.ok(userRepository.save(usr));
+		}
+		return ResponseEntity.ok(HttpStatus.BAD_REQUEST);
 	}
 
 	@RequestMapping(value = "/getUsersByRole/{role}", method = RequestMethod.GET)
